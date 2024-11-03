@@ -10,7 +10,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // For JSON requests
 app.use(cors());
-
+app.use(express.json());
 // Connect to MongoDB
 mongoose.connect(`${process.env.MONGODB_CONNECTION_STR}`, {
     useNewUrlParser: true,
