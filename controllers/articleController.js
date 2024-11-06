@@ -12,6 +12,20 @@ const getArticles = async (req, res) => {
     }
 };
 
+// Get a single article by ID
+const getArticleById = async (req, res) => {
+    try {
+        const article = await Article.findById(req.params.id);
+        if (!article) {
+            return res.status(404).send("Article not found");
+        }
+        res.send(article);
+    } catch (err) {
+        console.error("Error retrieving article:", err);
+        res.status(500).send("Error retrieving article");
+    }
+};
+
 // Post a new article
 const postArticle = async (req, res) => {
     try {
@@ -43,7 +57,7 @@ const delArticle = async (req, res) => {
     }
 };
 
-// update
+// Update an article by ID
 const updateArticle = async (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
@@ -66,9 +80,9 @@ const updateArticle = async (req, res) => {
     }
 };
 
-
 module.exports = {
     getArticles,
+    getArticleById,  // Add the new function to exports
     postArticle,
     delArticle,
     updateArticle
