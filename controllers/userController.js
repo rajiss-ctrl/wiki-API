@@ -12,17 +12,23 @@ const getUsers = async (req, res) => {
     }
 };
 
-// Get a single user by ID
 const getUserById = async (req, res) => {
+    console.log("Requested user ID:", req.params.id);  // Log ID for debugging
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid user ID format" });
+        }
+
         const user = await User.findById(req.params.id);
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).json({ message: "User not found" });
         }
-        res.send(user);
+
+        console.log("User found:", user);  // Log found user for debugging
+        res.json(user);
     } catch (err) {
-        console.error("Error retrieving user:", err);
-        res.status(500).send("Error retrieving user");
+        console.error("Error retrieving user:", err.message);
+        res.status(500).json({ error: "Error retrieving user", details: err.message });
     }
 };
 
