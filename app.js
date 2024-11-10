@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 const articleRoute = require('./routes/articleRoute');
+const userRoute = require('./routes/userRoute');
 
 const app = express();
 
@@ -21,10 +22,27 @@ mongoose.connect(`${process.env.MONGODB_CONNECTION_STR}`, {
 
 // Use article routes
 app.use('/articles', articleRoute);
+app.use('/users', userRoute);
 
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
+
+
+const PORT = 3000;
+let currentPort = PORT;
+
+function startServer(port) {
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${port} is already in use. Trying port ${port + 1}...`);
+            startServer(port + 1);
+        } else {
+            console.error(`Failed to start server: ${err.message}`);
+        }
+    });
+}
+
+startServer(currentPort);
    
 
 
