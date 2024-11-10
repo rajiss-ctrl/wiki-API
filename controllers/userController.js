@@ -12,23 +12,24 @@ const getUsers = async (req, res) => {
     }
 };
 
+// Get a single user by MongoDB ID or Firebase UID
 const getUserById = async (req, res) => {
-    console.log("Requested user ID:", req.params.id);  // Log ID for debugging
     try {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            return res.status(400).json({ message: "Invalid user ID format" });
-        }
+        const { id } = req.params;
+        
+        // Check if the id is a valid MongoDB ObjectId
+        const isMongoId = mongoose.Types.ObjectId.isValid(id);
+        const user = isMongoId 
+            ? await User.findById(id)  // Retrieve by MongoDB ID
+            : await User.findOne({ uid: id });  // Retrieve by Firebase UID
 
-        const user = await User.findById(req.params.id);
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).send("User not found");
         }
-
-        console.log("User found:", user);  // Log found user for debugging
-        res.json(user);
+        res.send(user);
     } catch (err) {
-        console.error("Error retrieving user:", err.message);
-        res.status(500).json({ error: "Error retrieving user", details: err.message });
+        console.error("Error retrieving user:", err);
+        res.status(500).send("Error retrieving user");
     }
 };
 
